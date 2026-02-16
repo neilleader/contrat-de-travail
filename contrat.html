@@ -1,0 +1,328 @@
+# contrat-de-travail<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oakmont - Générateur de Contrat</title>
+    <style>
+        :root {
+            --bg-body: #ffffff;
+            --bg-card: #fdfdfd;
+            --bg-input: #2f3456;
+            --accent: #ffffff;
+            --text: #ffffff;
+            --border: #3f446e;
+            --overlay: rgba(26, 28, 44, 0.85);
+        }
+
+        * { box-sizing: border-box; font-family: 'Segoe UI', sans-serif; }
+        body, html { margin: 0; padding: 0; min-height: 100vh; background: var(--bg-body); color: var(--text); }
+
+        #landing-page { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; text-align: center; }
+        .hero-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: url('https://i.imgur.com/your-image-here.jpg') center/cover no-repeat; filter: blur(3px); z-index: -1; }
+        .overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: var(--overlay); z-index: -1; }
+
+        .btn-nav { text-decoration: none; padding: 15px 40px; border-radius: 4px; font-weight: bold; text-transform: uppercase; cursor: pointer; transition: 0.3s; border: 2px solid var(--accent); background: var(--accent); color: var(--bg-body); margin: 10px; }
+        .btn-nav:hover { background: transparent; color: var(--accent); }
+
+        #form-plaignant { display: none; padding: 40px 20px; flex-direction: column; align-items: center; }
+        .container { width: 100%; max-width: 900px; background: var(--bg-card); padding: 40px; border-radius: 8px; border-top: 5px solid var(--accent); }
+
+        h1 { color: var(--accent); text-transform: uppercase; }
+        .form-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 20px; }
+        .input-group { display: flex; flex-direction: column; }
+        label { font-size: 0.85em; margin-bottom: 8px; color: #bbb; }
+        input { background: var(--bg-input); border: 1px solid var(--border); color: white; padding: 12px; border-radius: 4px; }
+
+        .submit-btn { background: var(--accent); color: #1a1c2c; border: none; padding: 18px; font-weight: bold; text-transform: uppercase; cursor: pointer; width: 100%; margin-top: 20px; border-radius: 4px; }
+        
+        #resultArea { 
+            margin-top: 40px; 
+            background: #fff; 
+            color: #000; 
+            padding: 40px; 
+            border-radius: 4px; 
+            display: none; 
+            white-space: pre-wrap; 
+            font-family: 'Times New Roman', serif; 
+            font-size: 14px; 
+            line-height: 1.4; 
+            text-align: left;
+        }
+
+        .copy-btn { background: #333; color: white; padding: 10px 20px; border: none; cursor: pointer; margin-bottom: 15px; border-radius: 4px; }
+
+        /* Mise en forme du texte généré */
+        .titre-geant { 
+            font-size: 28px; 
+            font-weight: bold; 
+            display: block; 
+            text-align: center; 
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+        .section-titre {
+            font-size: 18px;
+            font-weight: bold;
+            display: block;
+            margin-top: 20px;
+            text-decoration: underline;
+        }
+        .important {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="landing-page">
+        <div class="hero-bg"></div>
+        <div class="overlay"></div>
+        <h1 style="font-size: 3rem; color: var(--accent);">OAKMONT</h1>
+        <p>Générateur de Contrat de Services</p>
+        <button onclick="showPage()" class="btn-nav">Rédiger un Contrat</button>
+    </div>
+
+    <div id="form-plaignant">
+        <div class="container">
+            <h1>Détails du Contrat</h1>
+            <div class="form-section">
+                <div class="input-group">
+                    <label>Nom du Modèle</label>
+                    <input type="text" id="nom_modele" placeholder="Nom Prénom">
+                </div>
+                <div class="input-group">
+                    <label>Email du Modèle</label>
+                    <input type="text" id="mail_modele" placeholder="email@exemple.com">
+                </div>
+                <div class="input-group">
+                    <label>Date de Début</label>
+                    <input type="text" id="date_debut" placeholder="JJ/MM/AAAA">
+                </div>
+                <div class="input-group">
+                    <label>Date de Fin</label>
+                    <input type="text" id="date_fin" placeholder="JJ/MM/AAAA">
+                </div>
+                <div class="input-group">
+                    <label>Email Agence (Oakmont)</label>
+                    <input type="text" id="mail_agence" placeholder="votre@mail.com">
+                </div>
+		        <div class="input-group">
+                    <label>Pourcentage</label>
+                    <input type="text" id="pourcentage" placeholder="50%">
+                </div>              
+            </div>
+             
+            <button class="submit-btn" onclick="genererRapport()">Générer le texte exact</button>
+
+            <div id="resultArea">
+                <button class="copy-btn" onclick="copyToClipboard()">Copier le texte</button>
+                <div id="outputText"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showPage() {
+            document.getElementById('landing-page').style.display = 'none';
+            document.getElementById('form-plaignant').style.display = 'flex';
+        }
+
+        function genererRapport() {
+            const getV = (id) => document.getElementById(id).value || "________";
+            const agence = "Oakmont";
+            const nomPerso = "Alexandre Monteneri";
+            
+            // On construit le HTML avec les classes de mise en forme
+            const rapport = `
+<span class="titre-geant">Contrat
+De Services De Management De Réseaux Sociaux</span>
+
+<span class="important">Préparé pour:</span> ${getV('nom_modele')}
+
+<span class="important">Créé par:</span> ${agence}
+
+Contrat De Services De Management De Réseaux Sociaux
+
+
+Préparé pour:
+
+</span> ${getV('nom_modele')}
+
+
+
+
+Créé par:
+
+Alexandre Montoneri
+
+Le présent accord est conclu à compter du <span class="important">${getV('date_debut')}</span> entre Oakmont, ci-après dénommé l'Agence, dont le siège social est situé à Paris et </span> ${getV('nom_modele')}, ci-après dénommé le Modèle.
+
+Le Modèle entre dans cet accord en tant que contractant indépendant et continuera à être un contractant indépendant. En aucun cas, le Modèle ne considérera l'Agence comme un employeur, mais comme un agent qui procure des emplois pour le Modèle.
+
+Le Modèle n'aura droit à aucun des avantages fournis aux employés de l'Agence, y compris mais sans s'y limiter l'indemnisation des travailleurs, l'assurance invalidité et les congés payés.
+
+Considérant que le Modèle ci-dessous souhaite retenir l'Agence ci-dessous en tant que promoteur et représentant du Modèle, les parties ci-dessous acceptent par la présente de conclure ce Contrat d'Agence de Mannequinat.
+
+
+Agence
+
+Alexandre Montoneri, Oakmont
+Paris 16e, 06 33 54 59 33, alexandremontoneri@icloud.com   
+
+Modèle
+
+</span> ${getV('nom_modele')}, </span> ${getV('mail_modele')}
+
+Durée du Contrat
+
+</span> ${getV('date_debut')} – </span> ${getV('date_fin')}
+
+
+Termes
+
+Nomination
+
+</span> ${getV('nom_modele')} désigne par la présente Oakmont pour les représenter, en tant qu'Agence, sous toutes les formes concernant le mannequinat, les contrats, les spectacles et toutes autres affaires liées à leur carrière de mannequin.
+
+En permettant à Oakmont une procuration limitée, l'Agence pourra conclure des accords au nom de </span> ${getV('nom_modele')}, ainsi que fournir des signatures sur tout contrat et accord au nom du Modèle.
+
+Conseil
+
+Une fois que ce contrat entre en vigueur, le Modèle peut demander conseil ou avis à l'Agence, et/ou à ses membres, concernant toutes les affaires professionnelles qui entrent dans le cadre de ce Contrat.
+
+Dans le cas où le Modèle serait témoin ou aurait été témoin, ou ferait face ou aurait fait face, à un comportement inapproprié, non éthique, immoral ou illégal en travaillant avec/pour l'Agence, y compris tous les travaux de mannequinat et le temps passé dans les bureaux de l'Agence et parmi le personnel de l'Agence, le Modèle a le droit de signaler ce comportement à l'Agence, d'enregistrer une plainte auprès des départements juridique et des ressources humaines de l'Agence, le cas échéant, et de recevoir des conseils et des orientations de l'Agence qui détailleront les prochaines étapes, si nécessaire, pour garantir que la carrière et le statut de contractant indépendant du Modèle restent professionnels et soutenus par l'Agence.
+
+Le Modèle accepte également que demander l'avis professionnel de l'Agence (contrairement au signalement d'un comportement inapproprié) soit le choix du Modèle, et les opinions de l'Agence sont données à sa propre discrétion. Le Modèle ne tiendra pas l'Agence ou l'un de ses membres responsables de tout résultat défavorable, directement ou indirectement, résultant de tout conseil de l'Agence.
+
+Cependant, si le conseil donné par l'Agence est illégal, non éthique ou immoral ou est spécifiquement donné pour protéger ou bénéficier à l'Agence ou à l'un de ses associés ou partenariats contre le Modèle, le Modèle peut rechercher un recours contre celui-ci, de la manière qu'ils jugent nécessaire.
+
+
+Droits Exclusifs
+
+Oakmont a reçu le droit exclusif d'utiliser le nom du Modèle, ainsi que tous les portraits et photos approuvés en relation avec la publicité et/ou la promotion de </span> ${getV('nom_modele')}. L'Agence peut faire connaître qu'elle est le gestionnaire personnel exclusif du Modèle, ainsi qu'offrir des services similaires à d'autres en relation étroite avec le Modèle sans enfreindre les termes ou le contrat.
+
+Le Modèle accepte de mettre à jour toutes les cartes de contact, photographies, calendriers et tout autre article promotionnel régulièrement, selon ce qui est convenu entre les parties.
+
+
+
+Rémunération de l'Agence
+
+Le Modèle accepte de payer à l'Agence un pourcentage fixe de </span> ${getV('pourcentage')} de toutes les sommes, frais ou autres types de contributions reçus par le Modèle pendant la durée de ce Contrat d'Agence de Mannequinat.
+
+Oakmont percevra toutes les sommes et paiements pour les travaux effectués pendant la durée de cet Accord et retiendra 50% de ces fonds.
+
+
+Clause de Contractant Indépendant
+
+Le Modèle sera considéré, pour les besoins des taxes, des frais d'état et des réglementations, comme un contractant indépendant et sera responsable de tous les paiements de ces frais dus.
+
+
+Durée de l'Accord
+
+Ce Contrat d'Agence de Mannequinat commencera le <span class="important">${getV('date_debut')}</span> et se terminera le </span> ${getV('date_fin')}. Les Parties peuvent, par une extension écrite signée par les deux Parties, convenir de prolonger ce Contrat d'Agence de Mannequinat au-delà de </span> ${getV('date_fin')} à leur discrétion.
+
+
+Conduite Professionnelle
+
+Les Parties se conduiront en tout temps de manière professionnelle et ne feront rien qui puisse être considéré comme non éthique ou illégal pendant la durée de cet Accord. De plus, les Parties ne participeront à aucune action qui pourrait nuire à leur capacité à se conformer aux termes de cet Accord.
+
+En signant ce Contrat, il est entendu que le Modèle, l'Agence, les employés de l'Agence et les autres modèles de l'Agence acceptent de respecter toutes les règles et réglementations mises en place par l'Agence. L'Agence peut, avec un préavis de 30 jours au Modèle, résilier cet accord pour violation de cette section du Contrat. Si une violation survient de la part de l'Agence ou de tout affilié de l'Agence, le Modèle peut résilier ce Contrat sans préavis.
+
+
+Confidentialité
+
+Les deux Parties s'engagent à maintenir une stricte confidentialité et à ne divulguer aucune information sensible discutée pendant la durée du Contrat, que ce soit dans un cadre professionnel ou autre, à toute personne n'ayant pas déjà accès à ces informations.
+
+Toutes les informations confidentielles fournies par une Partie aux présentes ne seront utilisées par l'autre Partie que dans le but de fournir des services en vertu de cet Accord et, sauf si cela est nécessaire pour l'exécution des termes de cet Accord, ne seront pas divulguées à des tiers sans le consentement préalable de la Partie fournisseuse.
+
+Ce qui précède ne s'applique pas à toute information qui est publiquement disponible au moment de sa fourniture ou qui devient ensuite publiquement disponible, sauf si elle doit être divulguée par une autorité de réglementation dans l'exercice légitime et approprié de sa juridiction sur une Partie, tout auditeur des Parties aux présentes, par un processus judiciaire ou administratif ou autrement par la loi ou la réglementation applicable.
+
+
+Résiliation
+
+Si l'une des Parties souhaite mettre fin au Contrat, elle peut le faire en informant l'autre Partie par écrit. Si le Modèle souhaite résilier le contrat, il n'a pas besoin de fournir de préavis, sauf en écrit. Si l'Agence souhaite résilier le contrat, elle accepte de continuer à fournir les services comme d'habitude pendant une période maximale de trente (30) jours, pendant laquelle le Modèle est censé trouver une autre Agence pour la représentation.
+
+Si la résiliation est due à un harcèlement au travail présumé (sur les plateaux de tournage ou autrement), où l'Agence n'a pas pris les mesures nécessaires pour enquêter et remédier à la situation à la pleine satisfaction du Modèle, alors le Modèle, en tant que partie plaignante, peut résilier immédiatement ce Contrat et peut chercher tous les recours nécessaires et légaux, en invoquant la clause "Conduite Professionnelle".
+
+
+Droit Applicable
+
+En cas de litige, les deux Parties conviennent de régler l'affaire à l'amiable, avec l'aide d'un agent tiers. En cas d'échec à parvenir à un montant de règlement ou à accepter les conditions de règlement, les deux Parties peuvent se tourner vers les tribunaux en France, à Paris, pour obtenir une aide juridique et un jugement.
+
+
+Divisibilité
+
+Si une partie de ce Contrat est jugée fausse ou légalement inapplicable, pour quelque raison que ce soit, les termes, conditions et clauses restants du Contrat resteront légalement valides et exécutables.
+
+
+Relations de Travail
+
+Les deux Parties conviennent et comprennent qu'elles ne peuvent pas engager une relation qui va au-delà de la nature d'une relation de travail professionnelle, y compris celles considérées comme des relations romantiques au travail, même si les relations sont consensuelles, pendant la durée de ce Contrat.
+
+
+Assurance et Responsabilité
+
+Le Modèle accepte que l'Agence ne sera pas responsable de toute blessure ou dommage, et ne créera pas de police d'assurance santé pour le Modèle. Le Modèle doit veiller à sa propre santé et à son bien-être.
+
+Si les actions du Modèle entraînent une responsabilité ou un dommage pour l'Agence ou pour l'un de ses partenaires ou investisseurs, le Modèle devra payer lui-même. L'Agence se réserve le droit de ne pas payer pour tout dommage ou préjudice directement ou indirectement causé par le Modèle.
+
+
+Retour de Propriété
+
+Le Modèle accepte de retourner tous les articles qu'ils ont pris des plateaux de tournage/de photos de mode, à la partie originale qui a accueilli le tournage, à moins que le Modèle n'ait reçu la permission écrite ou exprimée verbalement de l'hôte qu'ils, le Modèle, peuvent prendre ces articles. Les articles tels que les produits échantillons ou les articles alimentaires gratuits ne sont pas inclus dans cette clause.
+
+
+Responsabilités de Travail
+
+Les deux Parties acceptent de faire un effort raisonnable pour s'assurer que le contrat est fructueux, de manière à bénéficier à la carrière du Modèle, et donc à la commission de l'Agence. Si le Modèle montre une éthique de travail médiocre ou manque des tournages à (Nombre) reprises sans aucun préavis et adéquat, l'Agence se réserve le droit de résilier le contrat sans préavis. Si la résiliation a été entreprise pour cette raison, l'Agence n'est pas tenue de représenter le Modèle pendant un total de trente (30) jours comme indiqué dans les clauses sous Résiliation ou Conduite Professionnelle.
+
+Engagement
+
+Les deux Parties acceptent que tous les termes, conditions et clauses mentionnés dans ce Contrat seront applicables et légalement exécutables une fois que les deux Parties auront signé le contrat. Les Parties acceptent également qu'aucune partie de ce Contrat ne peut être modifiée par une Partie sans le consentement exprès de l'autre Partie, ou en donnant un avis écrit.
+
+</span> ${getV('nom_modele')}, en tant que Modèle, accepte également qu'il ne soit représenté par aucune autre agence, et qu'aucun autre accord ne prévaudra sur l'accord que le Modèle a avec Oakmont, en tant qu'Agence.
+
+
+Formulaire d'Approbation
+
+EN SIGNANT CI-DESSOUS, LES DEUX PARTIES ACCEPTENT LES TERMES CONTENUS DANS CET ACCORD ET RECONNAISSENT AVOIR COMPRIS LES TERMES CONTENUS CI-DESSOUS.
+
+
+
+
+Oakmont                                                      </span> ${getV('nom_modele')}
+
+
+
+
+
+
+<img src="https://i.ibb.co/XZDc1H99/Ma-Signature.png" alt="Signature" width="200">                                                 (Signature Modèle)
+
+
+
+
+
+
+
+Alexandre Montoneri                                          </span> ${getV('nom_modele')}
+
+
+`;
+
+            // On utilise innerHTML pour appliquer les styles
+            document.getElementById('outputText').innerHTML = rapport;
+            document.getElementById('resultArea').style.display = 'block';
+        }
+
+        function copyToClipboard() {
+            // innerText permet de copier le texte brut sans les balises <span>
+            const text = document.getElementById('outputText').innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert("Contrat copié !");
+            });
+        }
+    </script>
+</body>
+</html>
